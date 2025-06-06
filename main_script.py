@@ -52,8 +52,6 @@ def clean_text_columns(df):
                 df[col] = df[col].astype(str).str.strip()
         if 'availability' in df.columns:
             df['availability'] = df['availability'].str.lower()
-        if 'brand_name' in df.columns:
-            df['brand_name'] = df['brand_name'].str.title()
         return df
     except Exception as e:
         logging.error(f"Error in clean_text_columns: {e}")
