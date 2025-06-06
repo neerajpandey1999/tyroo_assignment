@@ -3,7 +3,7 @@ import sqlite3
 import logging
 
 CSV_FILE = 'Tyroo-dummy-data.csv.gz'
-DB_FILE = 'tyroo_data_relational_validated.db'
+DB_FILE = 'Tyroo-dummy-data.db'
 SCHEMA_FILE = 'schema.sql'
 CHUNK_SIZE = 1000
 
@@ -36,14 +36,14 @@ NUMERIC_COLS = [
     'product_id', 'rating_avg_value', 'price'
 ]
 
-# def is_valid_url(url):
-#     try:
-#         if pd.isna(url):
-#             return False
-#         return str(url).startswith(('http://', 'https://', 'lazada://'))
-#     except Exception as e:
-#         logging.error(f"Error in is_valid_url: {e}")
-#         return False
+def is_valid_url(url):
+    try:
+        if pd.isna(url):
+            return False
+        return str(url).startswith(('http://', 'https://', 'lazada://'))
+    except Exception as e:
+        logging.error(f"Error in is_valid_url: {e}")
+        return False
 
 def clean_text_columns(df):
     try:
@@ -78,7 +78,7 @@ def filter_invalid_urls(df):
         total_invalid_rows = 0
         for col in URL_COLS:
             if col in df.columns:
-                valid_mask = df[col]
+                valid_mask = df[col].apply(is_valid_url)
                 invalid_count = (~valid_mask).sum()
                 if invalid_count > 0:
                     logging.warning(f"Removing {invalid_count} rows due to invalid URLs in '{col}'")
