@@ -36,14 +36,14 @@ NUMERIC_COLS = [
     'product_id', 'rating_avg_value', 'price'
 ]
 
-def is_valid_url(url):
-    try:
-        if pd.isna(url):
-            return False
-        return str(url).startswith(('http://', 'https://', 'lazada://'))
-    except Exception as e:
-        logging.error(f"Error in is_valid_url: {e}")
-        return False
+# def is_valid_url(url):
+#     try:
+#         if pd.isna(url):
+#             return False
+#         return str(url).startswith(('http://', 'https://', 'lazada://'))
+#     except Exception as e:
+#         logging.error(f"Error in is_valid_url: {e}")
+#         return False
 
 def clean_text_columns(df):
     try:
@@ -71,21 +71,22 @@ def clean_numeric_columns(df):
         logging.error(f"Error in clean_numeric_columns: {e}")
         return df
 
-def filter_invalid_urls(df):
-    try:
-        total_invalid_rows = 0
-        for col in URL_COLS:
-            if col in df.columns:
-                valid_mask = df[col].apply(is_valid_url)
-                invalid_count = (~valid_mask).sum()
-                if invalid_count > 0:
-                    logging.warning(f"Removing {invalid_count} rows due to invalid URLs in '{col}'")
-                df = df[valid_mask]
-                total_invalid_rows += invalid_count
-        return df, total_invalid_rows
-    except Exception as e:
-        logging.error(f"Error in filter_invalid_urls: {e}")
-        return df, 0
+# def filter_invalid_urls(df):
+#     try:
+#         total_invalid_rows = 0
+#         for col in URL_COLS:
+#             if col in df.columns:
+#                 invalid_mask = ~df[col].apply(is_valid_url)
+#                 invalid_count = invalid_mask.sum()
+#                 if invalid_count > 0:
+#                     logging.warning(f"{invalid_count} invalid URLs found in column '{col}'")
+#                     print(f"\nInvalid URLs in column '{col}':")
+#                     print(df.loc[invalid_mask, col])
+#                     total_invalid_rows += invalid_count
+#         return df, total_invalid_rows
+#     except Exception as e:
+#         logging.error(f"Error in filter_invalid_urls: {e}")
+#         return df, 0
 
 def remove_duplicates(df):
     try:
@@ -216,10 +217,10 @@ def process_chunk(df):
         initial_len = len(df)
         df = clean_text_columns(df)
         df = clean_numeric_columns(df)
-        df, invalid_urls = filter_invalid_urls(df)
+        # df, invalid_urls = filter_invalid_urls(df)
         df, duplicates_removed = remove_duplicates(df)
         dropped = initial_len - len(df)
-        return df, invalid_urls, duplicates_removed, dropped
+        return df, duplicates_removed, dropped
     except Exception as e:
         logging.error(f"Error in process_chunk: {e}")
         return df, 0, 0, 0
@@ -229,13 +230,12 @@ def process_csv():
         with sqlite3.connect(DB_FILE) as conn:
             create_tables_from_file(conn, SCHEMA_FILE)
 
-            total_rows = total_inserted = total_invalid_urls = total_duplicates = total_dropped = 0
+            total_rows = total_inserted = total_duplicates = total_dropped = 0
 
             for chunk_num, chunk in enumerate(pd.read_csv(CSV_FILE, chunksize=CHUNK_SIZE), start=1):
                 logging.info(f"Processing chunk {chunk_num} with {len(chunk)} rows")
                 total_rows += len(chunk)
-                cleaned, invalid_urls, duplicates, dropped = process_chunk(chunk)
-                total_invalid_urls += invalid_urls
+                cleaned, duplicates, dropped = process_chunk(chunk)
                 total_duplicates += duplicates
                 total_dropped += dropped
 
@@ -250,9 +250,8 @@ def process_csv():
             logging.info(f"Total rows read: {total_rows}")
             logging.info(f"Total rows inserted: {total_inserted}")
             logging.info(f"Total rows dropped: {total_dropped}")
-            logging.info(f" - Invalid URLs: {total_invalid_urls}")
-            logging.info(f" - Duplicate rows: {total_duplicates}")
-            logging.info(f" - Other drops (numeric/cleaning): {total_dropped - total_invalid_urls - total_duplicates}")
+            logging.info(f" Duplicate rows: {total_duplicates}")
+            logging.info(f" Other drops (numeric/cleaning): {total_dropped - total_duplicates}")
     except Exception as e:
         logging.error(f"Fatal error in process_csv: {e}")
 

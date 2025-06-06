@@ -59,16 +59,12 @@ Data is processed in chunks of 1000 rows for memory efficiency.
 * Removes negatives.
 * Fills missing values (except for ID fields) with column median.
 
-### 4. URL Validation
 
-* Checks for valid URL prefixes (`http`, `https`, `lazada`).
-* Drops rows with invalid URLs.
-
-### 5. Duplicate Removal
+### 4. Duplicate Removal
 
 * Drops duplicates based on `sku_id` and `product_id`.
 
-### 6. Relational Mapping
+### 5. Relational Mapping
 
 * Maintains category hierarchy across three levels.
 * Associates products with sellers.
@@ -128,18 +124,6 @@ At the end of execution:
 
 ---
 
-## Features
-
-| Feature            | Description                                        |
-| ------------------ | -------------------------------------------------- |
-| Chunked processing | Handles large files efficiently                    |
-| Text cleanup       | Formatting and normalization of text fields        |
-| URL filtering      | Removes rows with invalid URLs                     |
-| Duplicate removal  | Based on `sku_id` and `product_id`                 |
-| Relational storage | Categories and sellers stored in normalized tables |
-| Logging            | Detailed logs for auditing and debugging           |
-
----
 
 ## Sample Execution
 
