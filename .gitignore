@@ -1,0 +1,18 @@
+# Ignore all .idea files except specific ones if needed
+.idea/
+!.idea/misc.xml
+!.idea/workspace.xml
+
+# Ignore data files
+*.csv
+*.csv.gz
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore SQLite database file
+*.db
+
+# Ignore logs
+*.log
