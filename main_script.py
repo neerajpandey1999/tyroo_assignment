@@ -50,8 +50,8 @@ def clean_text_columns(df):
         for col in TEXT_COLS:
             if col in df.columns:
                 df[col] = df[col].astype(str).str.strip()
-        if 'availability' in df.columns:
-            df['availability'] = df['availability'].str.lower()
+        # if 'availability' in df.columns:
+        #     df['availability'] = df['availability'].str.lower()
         return df
     except Exception as e:
         logging.error(f"Error in clean_text_columns: {e}")
